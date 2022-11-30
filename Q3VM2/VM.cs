@@ -206,12 +206,12 @@ namespace Q3VM2 {
             // Console.Write(string.Format(str, args));
         }
 
-        static void memset(void* str, int c, uint n) {
+        public static void memset(void* str, int c, uint n) {
             for (int i = 0; i < n; i++)
                 ((byte*)str)[i] = (byte)c;
         }
 
-        static void memcpy(void* dest, void* src, uint n) {
+        public static void memcpy(void* dest, void* src, uint n) {
             byte* dest_b = (byte*)dest;
             byte* src_b = (byte*)src;
 
@@ -448,7 +448,7 @@ namespace Q3VM2 {
             return fi.i;
         }
 
-        static int VM_MemoryRangeValid(IntPtr vmAddr, uint len, ref VirtMachine vm) {
+        public static int VM_MemoryRangeValid(IntPtr vmAddr, uint len, ref VirtMachine vm) {
             if (vmAddr == null) {
                 return -1;
             }

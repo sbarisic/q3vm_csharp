@@ -4,6 +4,14 @@
 #ifndef BG_LIB_H
 #define BG_LIB_H
 
+#ifndef Q3_VM
+#define Q3_VM
+#endif
+
+#ifndef null
+#define null ((void*)0)
+#endif
+
 typedef int size_t;
 
 typedef char* va_list;
@@ -37,6 +45,7 @@ int rand(void);
 size_t strlen(const char* string);
 char* strcat(char* strDestination, const char* strSource);
 char* strcpy(char* strDestination, const char* strSource);
+char* strncpy(char* s1, const char* s2, size_t n);
 int strcmp(const char* string1, const char* string2);
 char* strchr(const char* string, int c);
 char* strstr(const char* string, const char* strCharSet);
