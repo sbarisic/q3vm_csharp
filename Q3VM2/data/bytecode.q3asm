@@ -1,0 +1,5 @@
+-o "bytecode"
+out/g_main
+out/g_syscalls
+out/bg_lib
+

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
+// https://www.icculus.org/~phaethon/q3mc/q3vm_specs.html
+
 namespace Q3VM2 {
     enum vmErrorCode_t {
         VM_NO_ERROR = 0,
