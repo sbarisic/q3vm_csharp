@@ -39,6 +39,16 @@ namespace Q3VM2 {
 
                     return args[1];
 
+                // MALLOC
+                case -5: {
+                    int AllocLen = (int)args[1];
+                    return VM.VM_VMMalloc(AllocLen, ref vm, out IntPtr ptr);
+                }
+
+                // FREE
+                case -6:
+                    return IntPtr.Zero;
+
                 case -69:
                     Console.WriteLine("Nice.");
                     break;
@@ -61,10 +71,12 @@ namespace Q3VM2 {
             if (!VM.VM_Create(ref Instance, FName, File.ReadAllBytes(FName), systemCalls))
                 throw new Exception("Holy shit!");
 
-            byte[] Bytecode = File.ReadAllBytes("data/bytecode.qvm");
+            byte[] asm_bytes = File.ReadAllBytes("data/bytecode.qvm");
+            int asm_bytes_vmaddr = (int)VM.VM_VMMalloc(asm_bytes.Length, ref Instance, out IntPtr asm_bytes_pointer);
 
+            VM.memcpy((void*)asm_bytes_pointer, asm_bytes, (uint)asm_bytes.Length);
 
-            int Ret = (int)VM.VM_Call(ref Instance, 1, null);
+            int Ret = (int)VM.VM_Call(ref Instance, 0, new int[] { asm_bytes_vmaddr, asm_bytes.Length });
 
             Console.WriteLine();
             Console.WriteLine(">> {0}", Ret);

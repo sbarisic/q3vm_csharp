@@ -179,6 +179,9 @@ namespace Q3VM2 {
         public int dataMask;
         public int dataAlloc;
 
+        public int dataMallocLen;
+        public int dataMallocStart;
+
         public int stackBottom;
 
         public int numSymbols;
@@ -217,6 +220,13 @@ namespace Q3VM2 {
 
             for (int i = 0; i < n; i++)
                 dest_b[i] = src_b[i];
+        }
+
+        public static void memcpy(void* dest, byte[] src, uint n) {
+            byte* dest_b = (byte*)dest;
+
+            for (int i = 0; i < n; i++)
+                dest_b[i] = src[i];
         }
 
         static void strncpy(char* dest, char* src, uint n) {
@@ -338,7 +348,11 @@ namespace Q3VM2 {
                 return null;
             }
 
+            vm.dataMallocLen = 1024 * 150;
             dataLength = header.h->dataLength + header.h->litLength + header.h->bssLength;
+
+            vm.dataMallocStart = dataLength + 16;
+            dataLength += vm.dataMallocLen;
 
             for (i = 0; dataLength > (1 << i); i++) {
             }
@@ -346,12 +360,14 @@ namespace Q3VM2 {
             dataLength = 1 << i;
 
             vm.dataAlloc = dataLength + 4;
-            vm.dataBase = (byte*)Com_malloc((uint)vm.dataAlloc, ref vm, vmMallocType_t.VM_ALLOC_DATA_SEC);
+            vm.dataBase = (byte*)Com_malloc((uint)(vm.dataAlloc ), ref vm, vmMallocType_t.VM_ALLOC_DATA_SEC);
             vm.dataMask = dataLength - 1;
             if (vm.dataBase == null) {
                 Com_Error(vmErrorCode_t.VM_MALLOC_FAILED, "Data malloc failed: out of memory?\n");
                 return null;
             }
+
+
 
             memset(vm.dataBase, 0, (uint)vm.dataAlloc);
             memcpy(vm.dataBase, header.v + header.h->dataOffset, (uint)(header.h->dataLength + header.h->litLength));
@@ -381,7 +397,7 @@ namespace Q3VM2 {
             args[0] = command;
 
             if (command_args != null) {
-                for (int i = 1; i < command_args.Length; i++)
+                for (int i = 1; i < command_args.Length + 1; i++)
                     args[i] = command_args[i - 1];
             }
 
@@ -1097,6 +1113,14 @@ namespace Q3VM2 {
 
         public static IntPtr TranslateAddress(IntPtr Address, ref VirtMachine vm) {
             return (IntPtr)VM_ArgPtr(Address, ref vm);
+        }
+
+        public static IntPtr VM_VMMalloc(int size, ref VirtMachine vm, out IntPtr GlobalAddr) {
+            IntPtr Addr = (IntPtr)vm.dataMallocStart;
+            vm.dataMallocStart += size;
+
+            GlobalAddr = (IntPtr)VM_ArgPtr(Addr, ref vm);
+            return Addr;
         }
     }
 }

@@ -65,6 +65,8 @@ void* memmove(void* dest, const void* src, size_t count);
 void* memset(void* dest, int c, size_t count);
 void* memcpy(void* dest, const void* src, size_t count);
 
+void* malloc(int size);
+
 // Math functions
 int abs(int n);
 double fabs(double x);

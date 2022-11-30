@@ -242,13 +242,13 @@ void Com_Error(vmErrorCode_t level, const char* error) {
 
 void* Com_malloc(size_t size, vm_t* vm, vmMallocType_t type) {
     // TODO
-    printf("TODO: Com_malloc");
-    return null;
+    // printf("TODO: Com_malloc\n");
+    return malloc((int)size);
 }
 
 void Com_free(void* p, vm_t* vm, vmMallocType_t type) {
     // TODO
-    printf("TODO: Com_free");
+    printf("TODO: Com_free\n");
 }
 
 
@@ -340,7 +340,7 @@ vmHeader_t* VM_LoadQVM(vm_t* vm, const uint8_t* bytecode,
     if (!header.h || !bytecode || length <= (int)sizeof(vmHeader_t) ||
         length > 0x400000)
     {
-        printf("Failed.\n");
+        printf("Failed. 0x000\n");
         return ((void*)0);
     }
 
@@ -1253,10 +1253,21 @@ void VM_VmProfile_f(const vm_t* vm)
 
 intptr_t syscalls_func(vm_t* vm, intptr_t* args) {
     const int id = -1 - ((int)args[0]);
+    char* str;
 
     switch (id) {
+        case -1:
+            str = (char*)VM_ArgPtr(args[1], vm);
+            printf("%s", str);
+            break;
+
+        case -69:
+            printf("Nice.\n");
+            break;
+
         default:
             printf("Bad system call: %i\n", id);
+            break;
     }
 
     return (intptr_t)0;
@@ -1266,12 +1277,10 @@ int _main(int command, int arg0, int arg1) {
     vm_t vm;
     int result;
 
-    byte* buffer;
-    int buffer_len;
-
-    VM_Create(&vm, "Que?", buffer, buffer_len, syscalls_func);
-    result = (int)VM_Call(&vm, 12345);
+    VM_Create(&vm, "Que?", (byte*)arg0, arg1, syscalls_func);
+    VM_Call(&vm, 0);
+    result = (int)VM_Call(&vm, 1);
 
     printf("Que? resulted in = %i\n", result);
-    return 420;
+    return 789;
 }
